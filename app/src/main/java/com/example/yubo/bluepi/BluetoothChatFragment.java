@@ -59,7 +59,7 @@ import org.json.JSONObject;
  * This fragment controls Bluetooth to communicate with other devices.
  */
 
-public class BluetoothChatFragment extends android.support.v4.app.Fragment {
+public class BluetoothChatFragment extends android.support.v7.app.AppCompatDialogFragment {
 
 
     private static final String TAG = "BluetoothChatFragment";

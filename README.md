@@ -7,7 +7,7 @@ An Android App based on Google samples - [Android-BluetoothChat](https://github.
 
 ## Instruction
 
-Bluetooth-RPi is used with [Bluetooth-RPi-Python](https://github.com/Yurockkk/Bluetooth-RPi-Python) runnung on your RPi 3. You'll need to bluetooth connect to your RPi before configuring its wifi setting.
+Bluetooth-RPi is used with [Bluetooth-RPi-Python](https://github.com/Yurockkk/Bluetooth-RPi-Python) running on your RPi 3. You'll need to bluetooth connect to your RPi before configuring its wifi setting.
 
 ### Step 0 - Get [Bluetooth-RPi-Python](https://github.com/Yurockkk/Bluetooth-RPi-Python) running on your RPi 3
 

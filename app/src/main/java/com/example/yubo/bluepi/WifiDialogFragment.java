@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -19,7 +19,7 @@ import android.widget.EditText;
  * Created by yubo on 7/19/17.
  */
 
-public class WifiDialogFragment extends DialogFragment {
+public class WifiDialogFragment extends AppCompatDialogFragment {
 
     private static final String TAG = "WifiDialogFragment";
 
