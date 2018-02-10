@@ -5,7 +5,6 @@
 bin/
 gen/
 *.iml
-.gradle
 /local.properties
 .idea/
 /.idea/workspace.xml
@@ -14,7 +13,9 @@ gen/
 .idea/misc.xml
 .idea/inspectionProfiles/
 .DS_Store
-/build
 /captures
 .externalNativeBuild
-
+build.gradle
+app.build.grandle
+.gradle/
+build/

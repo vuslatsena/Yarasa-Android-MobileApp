@@ -18,6 +18,7 @@
 
 package com.example.yubo.bluepi;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,7 +26,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -34,6 +41,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Set;
 
@@ -41,7 +49,7 @@ import java.util.Set;
  * Created by yubo on 7/11/17.
  */
 
-public class DeviceListActivity extends Activity {
+public class DeviceListActivity extends AppCompatActivity {
 
     /**
      * Tag for Log
@@ -63,6 +71,11 @@ public class DeviceListActivity extends Activity {
      */
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
 
+    private int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 666;
+
+    private Button scanButton;
+
+
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,11 +88,16 @@ public class DeviceListActivity extends Activity {
         setResult(Activity.RESULT_CANCELED);
 
         // Initialize the button to perform device discovery
-        Button scanButton = (Button) findViewById(R.id.button_scan);
+        scanButton = findViewById(R.id.button_scan);
         scanButton.setOnClickListener(new View.OnClickListener() {
+
             public void onClick(View v) {
-                doDiscovery();
-                v.setVisibility(View.GONE);
+                // Only ask for these permissions on runtime when running Android 6.0 or higher
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    checkLocationPermission();
+                }else{
+                    doDiscovery();
+                }
             }
         });
 
@@ -104,6 +122,7 @@ public class DeviceListActivity extends Activity {
         this.registerReceiver(mReceiver, filter);
 
         // Register for broadcasts when discovery has finished
+
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
 
@@ -125,6 +144,20 @@ public class DeviceListActivity extends Activity {
         }
     }
 
+    void checkLocationPermission() {
+
+        //check if we have ACCESS_COARSE_LOCATION permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            //We don't have ACCESS_COARSE_LOCATION permission, request the permission.
+            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSIONS_REQUEST_FINE_LOCATION);
+        }else{
+            //we have permission
+            doDiscovery();
+
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -138,12 +171,28 @@ public class DeviceListActivity extends Activity {
         this.unregisterReceiver(mReceiver);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == MY_PERMISSIONS_REQUEST_FINE_LOCATION){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                doDiscovery();
+
+            }else{
+                Toast.makeText(this, R.string.permission_declined, Toast.LENGTH_SHORT).show();
+                scanButton.setVisibility(View.VISIBLE);
+            }
+        }else{
+            //other request permission
+        }
+    }
+
     /**
      * Start device discover with the BluetoothAdapter
      */
     private void doDiscovery() {
         Log.d(TAG, "doDiscovery()");
-
+        scanButton.setVisibility(View.GONE);
         // Indicate scanning in the title
         setProgressBarIndeterminateVisibility(true);
         setTitle(R.string.scanning);
@@ -155,6 +204,12 @@ public class DeviceListActivity extends Activity {
         if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
+
+        int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+
 
         // Request discover from BluetoothAdapter
         mBtAdapter.startDiscovery();
@@ -191,7 +246,7 @@ public class DeviceListActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-
+            Log.d(TAG,"mNewDevicesArrayAdapter" + mNewDevicesArrayAdapter.toString());
             // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
